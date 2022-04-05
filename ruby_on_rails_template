@@ -1,0 +1,86 @@
+# Ruby Template Site
+## This template site for Ruby on Rails works on WSL Ubuntu (Version 2)
+ - Have Docker Desktop installed on Windows
+
+## Install node, yarn, gcc, g++, and all required packages for rails
+```
+sudo apt install curl
+curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+sudo apt-get install gcc g++ make -y
+curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | sudo tee /usr/share/keyrings/yarnkey.gpg >/dev/null
+sudo apt-get update -y && sudo apt-get install yarn -y
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
+sudo apt-get update
+sudo apt-get install git-core zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libsqlite3-dev sqlite3 libxml2-dev libxslt1-dev libcurl4-openssl-dev software-properties-common libffi-dev nodejs yarn -y
+
+cd
+git clone https://github.com/rbenv/rbenv.git ~/.rbenv
+echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(rbenv init -)"' >> ~/.bashrc
+exec $SHELL
+
+git clone https://github.com/rbenv/ruby-build.git ~/.rbenv/plugins/ruby-build
+echo 'export PATH="$HOME/.rbenv/plugins/ruby-build/bin:$PATH"' >> ~/.bashrc
+exec $SHELL
+
+rbenv install 3.1.1
+rbenv global 3.1.1
+
+gem install bundler
+```
+
+## Configure Git
+```
+git config --global color.ui true
+git config --global user.name "Juniper Riley Wilkes"
+git config --global user.email "juniperrileyw@gmail.com"
+ssh-keygen -t rsa -b 4096 -C "juniperrileyw@gmail.com"
+
+cat ~/.ssh/id_rsa.pub
+```
+ - Paste the output into your account's setting's SSH keys
+ - Verify that it works with:
+```
+ssh -T git@github.com
+```
+## Install Rails
+```
+gem install rails -v 7.0.2.3
+rbenv rehash
+rails -v
+```
+## Set up the database wit Postgresql
+ - Create the file repository configuration:
+```
+sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+```
+ - Import the repository signing key:
+```
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+```
+ - Update the package lists:
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+ - Install the latest version of PostgreSQL.
+ - If you want a specific version, use 'postgresql-12' or similar instead of 'postgresql':
+```
+sudo apt-get -y install postgresql
+sudo apt install libpq-dev
+sudo /etc/init.d/postgresql start
+```
+## Set up new project in your project folder
+```
+cd <PROJECT_FOLDER>
+rails new <PROJECT_NAME> --database=postgresql --css tailwind
+cd <PROJECT_NAME>
+sudo vim /etc/postgresql/<VERSION>/main/postgresql.conf
+```
+ - Enable "listen_addresses"
+```
+sudo -u postgres createuser -s junie
+rake db:create
+```
